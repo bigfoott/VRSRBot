@@ -111,7 +111,8 @@ namespace VRSRBot
                             IconUrl = "https://bigft.io/vrsrbot_icon.png"
                         },
                         Description = "[View the run on Speedrun.com](" + run.Link + ")",
-                        ThumbnailUrl = "https://www.speedrun.com/themes/" + run.GameAbbr + "/cover-256.png"
+                        ThumbnailUrl = "https://www.speedrun.com/themes/" + run.GameAbbr + "/cover-256.png",
+                        Timestamp = DateTime.Now
                     };
 
                     embed.AddField("Category", $"**[{run.GameName}]({run.GameLink})** - **[{run.Category}]({run.CategoryLink})**");
