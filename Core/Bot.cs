@@ -26,6 +26,9 @@ namespace VRSRBot.Core
 
         public TwitterListener Twitter;
 
+        private static ulong BotId;
+        private static Dictionary<DiscordMember, DateTime> lastReaction;
+
         public Bot(Config cfg)
         {
             Prog.Log("Initializing Bot...", "&3");
@@ -62,13 +65,11 @@ namespace VRSRBot.Core
 
             Client.MessageReactionAdded += async e =>
             {
-                if (e.User.Id != Client.CurrentUser.Id)
-                    await ToggleRole((DiscordMember)e.User, e.Guild.GetRole(Prog.RoleMessages.FirstOrDefault(r => r.MessageId == e.Message.Id).RoleId));
+                await ToggleRole((DiscordMember)e.User, e.Guild.GetRole(Prog.RoleMessages.FirstOrDefault(r => r.MessageId == e.Message.Id).RoleId));
             };
             Client.MessageReactionRemoved += async e =>
             {
-                if (e.User.Id != Client.CurrentUser.Id)
-                    await ToggleRole((DiscordMember)e.User, e.Guild.GetRole(Prog.RoleMessages.FirstOrDefault(r => r.MessageId == e.Message.Id).RoleId));
+                await ToggleRole((DiscordMember)e.User, e.Guild.GetRole(Prog.RoleMessages.FirstOrDefault(r => r.MessageId == e.Message.Id).RoleId));
             };
             Client.MessageDeleted += async e =>
             {
@@ -85,6 +86,9 @@ namespace VRSRBot.Core
             Client.Ready += async e =>
             {
                 await Client.UpdateStatusAsync(new DiscordActivity("speedrun.com", ActivityType.Watching), UserStatus.Online);
+                
+                BotId = Client.CurrentUser.Id;
+                lastReaction = new Dictionary<DiscordMember, DateTime>();
             };
 
             Prog.Log("Bot initialization complete. Connecting...", "&3");
@@ -158,10 +162,34 @@ namespace VRSRBot.Core
 
         private static async Task ToggleRole(DiscordMember member, DiscordRole role)
         {
-            if (member.Roles.Contains(role))
-                await member.RevokeRoleAsync(role);
-            else
-                await member.GrantRoleAsync(role);
+            if (member.Id != BotId)
+            {
+                // Clear out the lastReaction variable if it starts to get too full
+                if (lastReaction.Count > 0)
+                {
+                    List<DiscordMember> remove = new List<DiscordMember>();
+                    foreach (KeyValuePair<DiscordMember, DateTime> reaction in lastReaction)
+                    {
+                        if (reaction.Value.Second > 1)
+                            remove.Add(reaction.Key);
+                    }
+                    foreach (DiscordMember reaction in remove)
+                        lastReaction.Remove(reaction);
+                }
+                
+                if (lastReaction.ContainsKey(member))
+                {
+                    if (DateTime.Now.Subtract(lastReaction[member]).TotalSeconds < 1)
+                        return;
+                    lastReaction.Remove(member);
+                }
+                lastReaction.Add(member, DateTime.Now);
+                
+                if (member.Roles.Contains(role))
+                    await member.RevokeRoleAsync(role);
+                else
+                    await member.GrantRoleAsync(role);
+            }
         }
     }
 }
