@@ -18,20 +18,23 @@ namespace VRSRBot.CNext
         [Command("createrolemsg")]
         public async Task Help(CommandContext ctx, DiscordRole role)
         {
-            var emoji = DiscordEmoji.FromGuildEmote(ctx.Client, 665860688463396864);
-            var embed = new DiscordEmbedBuilder()
+            if (ctx.Member.PermissionsIn(ctx.Channel).HasFlag(DSharpPlus.Permissions.ManageRoles))
             {
-                Description = $"**React to this message with {emoji} to toggle the {role.Mention} role.**"
-            };
-            var msg = await ctx.RespondAsync("", embed: embed);
+                var emoji = DiscordEmoji.FromGuildEmote(ctx.Client, 665860688463396864);
+                var embed = new DiscordEmbedBuilder()
+                {
+                    Description = $"**React to this message with {emoji} to toggle the {role.Mention} role.**"
+                };
+                var msg = await ctx.RespondAsync("", embed: embed);
 
-            var list = Prog.RoleMessages.ToList();
-            list.Add(new RoleMessage(msg.Id, role.Id));
-            Prog.RoleMessages = list.ToArray();
-            
-            File.WriteAllText("files/rolemessages.json", JsonConvert.SerializeObject(Prog.RoleMessages, Formatting.Indented));
+                var list = Prog.RoleMessages.ToList();
+                list.Add(new RoleMessage(msg.Id, role.Id));
+                Prog.RoleMessages = list.ToArray();
 
-            await msg.CreateReactionAsync(emoji);
+                File.WriteAllText("files/rolemessages.json", JsonConvert.SerializeObject(Prog.RoleMessages, Formatting.Indented));
+
+                await msg.CreateReactionAsync(emoji);
+            }
         }
     }
 }
