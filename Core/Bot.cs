@@ -61,6 +61,7 @@ namespace VRSRBot.Core
                 EnableMentionPrefix = true,
                 IgnoreExtraArguments = true
             });
+            CommandsNext.RegisterCommands<CNext.General>();
             CommandsNext.RegisterCommands<CNext.Roles>();
 
             Client.MessageReactionAdded += async e =>
