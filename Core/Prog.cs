@@ -7,13 +7,15 @@ using System.Text;
 using System.Threading.Tasks;
 using VRSRBot.Util;
 
-namespace VRSRBot
+namespace VRSRBot.Core
 {
     class Prog
     {
         public static Config Config;
         public static Bot Bot;
         public static Game[] Games;
+        public static RoleMessage[] RoleMessages;
+
 
         static void Main(string[] args)
         {
@@ -44,6 +46,13 @@ namespace VRSRBot
                 Log("'files/games.json' file not found. File created.", "&e");
             }
             Games = JsonConvert.DeserializeObject<Game[]>(File.ReadAllText("files/games.json"));
+
+            if (!File.Exists("files/rolemessages.json"))
+            {
+                File.WriteAllText("files/rolemessages.json", JsonConvert.SerializeObject(new Game[0], Formatting.Indented));
+                Log("'files/rolemessages.json' file not found. File created.", "&e");
+            }
+            RoleMessages = JsonConvert.DeserializeObject<RoleMessage[]>(File.ReadAllText("files/rolemessages.json"));
 
             Log("Loaded config files.");
 

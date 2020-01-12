@@ -7,13 +7,14 @@ using DSharpPlus.Net.WebSocket;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
 using System.Threading.Tasks;
 using VRSRBot.Util;
 
-namespace VRSRBot
+namespace VRSRBot.Core
 {
     class Bot
     {
@@ -57,7 +58,29 @@ namespace VRSRBot
                 EnableMentionPrefix = true,
                 IgnoreExtraArguments = true
             });
-            //CommandsNext.RegisterCommands<General>();
+            CommandsNext.RegisterCommands<CNext.Roles>();
+
+            Client.MessageReactionAdded += async e =>
+            {
+                if (e.User.Id != Client.CurrentUser.Id)
+                    await ToggleRole((DiscordMember)e.User, e.Guild.GetRole(Prog.RoleMessages.FirstOrDefault(r => r.MessageId == e.Message.Id).RoleId));
+            };
+            Client.MessageReactionRemoved += async e =>
+            {
+                if (e.User.Id != Client.CurrentUser.Id)
+                    await ToggleRole((DiscordMember)e.User, e.Guild.GetRole(Prog.RoleMessages.FirstOrDefault(r => r.MessageId == e.Message.Id).RoleId));
+            };
+            Client.MessageDeleted += async e =>
+            {
+                if (Prog.RoleMessages.Any(r => r.MessageId == e.Message.Id))
+                {
+                    var list = Prog.RoleMessages.ToList();
+                    list.RemoveAll(r => r.MessageId == e.Message.Id);
+                    Prog.RoleMessages = list.ToArray();
+
+                    File.WriteAllText("files/rolemessages.json", JsonConvert.SerializeObject(Prog.RoleMessages, Formatting.Indented));
+                }
+            };
 
             Client.Ready += async e =>
             {
@@ -79,7 +102,7 @@ namespace VRSRBot
             };
             Twitter.Init();
         }
-        
+
         private static Task<int> PrefixPredicateAsync(DiscordMessage m)
         {
             string pref = Prog.Config.Prefix;
@@ -131,6 +154,14 @@ namespace VRSRBot
                 };
                 wc.DownloadStringAsync(new Uri("https://www.speedrun.com/api/v1/runs/" + id + "?embed=category,players,variables,category.variables,game,platform"));
             }
+        }
+
+        private static async Task ToggleRole(DiscordMember member, DiscordRole role)
+        {
+            if (member.Roles.Contains(role))
+                await member.RevokeRoleAsync(role);
+            else
+                await member.GrantRoleAsync(role);
         }
     }
 }

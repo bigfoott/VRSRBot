@@ -158,10 +158,12 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Bot.cs" />
+    <Compile Include="CNext\Roles.cs" />
+    <Compile Include="Core\Bot.cs" />
     <Compile Include="CNext\General.cs" />
-    <Compile Include="Prog.cs" />
+    <Compile Include="Core\Prog.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Util\RoleMessage.cs" />
     <Compile Include="Util\Config.cs" />
     <Compile Include="Util\FConsole.cs" />
     <Compile Include="Util\Game.cs" />
