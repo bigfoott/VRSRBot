@@ -7,6 +7,7 @@ using DSharpPlus.Net.WebSocket;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Net;
@@ -84,12 +85,51 @@ namespace VRSRBot.Core
                 }
             };
 
+            // when a guild becomes available, check for any role messages that got deleted while the bot was offline
+            Client.GuildAvailable += async e =>
+            {
+                Prog.Log($"Checking for deleted role messages while offline in server '{e.Guild.Name}'...", "&e");
+                
+                List<RoleMessage> tempRoleMessages = Prog.RoleMessages.ToList();
+                var channel = await Client.GetChannelAsync(Prog.Config.RoleChannel);
+                
+                foreach (RoleMessage rm in Prog.RoleMessages)
+                {
+                    DiscordMessage msg = null;
+
+                    try { msg = await channel.GetMessageAsync(rm.MessageId); continue; }
+                    catch { }
+                    
+                    if (msg == null)
+                        tempRoleMessages.Remove(rm);
+                }
+
+                int diff = Prog.RoleMessages.Length - tempRoleMessages.Count;
+                if (diff > 0)
+                {
+                    string _s = "s";
+                    string _them = "them";
+                    if (diff == 1)
+                    {
+                        _s = "";
+                        _them = "it";
+                    }
+
+                    Prog.Log($"Found {Prog.RoleMessages.Length - tempRoleMessages.Count} deleted message{_s} in server '{e.Guild.Name}' and removed {_them}.", "&e");
+                    Prog.RoleMessages = tempRoleMessages.ToArray();
+                    File.WriteAllText("files/rolemessages.json", JsonConvert.SerializeObject(Prog.RoleMessages, Formatting.Indented));
+                }
+                else
+                    Prog.Log($"No role messages were deleted in server '{e.Guild.Name}'.", "&e");
+            };
+
             Client.Ready += async e =>
             {
                 await Client.UpdateStatusAsync(new DiscordActivity("speedrun.com", ActivityType.Watching), UserStatus.Online);
                 
                 BotId = Client.CurrentUser.Id;
                 lastReaction = new Dictionary<DiscordMember, DateTime>();
+                
             };
 
             Prog.Log("Bot initialization complete. Connecting...", "&3");

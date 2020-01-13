@@ -18,6 +18,8 @@ namespace VRSRBot.CNext
         [Command("createrolemsg")]
         public async Task Help(CommandContext ctx, DiscordRole role)
         {
+            if (ctx.Channel.Id != Prog.Config.RoleChannel) return;
+
             if (ctx.Member.PermissionsIn(ctx.Channel).HasFlag(DSharpPlus.Permissions.ManageRoles))
             {
                 if (ctx.Guild.CurrentMember.PermissionsIn(ctx.Channel).HasFlag(DSharpPlus.Permissions.ManageMessages))

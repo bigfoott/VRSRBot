@@ -14,6 +14,7 @@ namespace VRSRBot.Util
         
         public string Prefix;
         public ulong WRChannel;
+        public ulong RoleChannel;
 
         public TwitterConfig TwitterCfg;
 
@@ -24,6 +25,7 @@ namespace VRSRBot.Util
 
             Prefix = "!";
             WRChannel = 0;
+            RoleChannel = 0;
 
             TwitterCfg = new TwitterConfig();
         }
