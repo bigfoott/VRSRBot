@@ -20,5 +20,19 @@ namespace VRSRBot.CNext
             };
             await ctx.RespondAsync("", embed: embed);
         }
+
+        [Command("say")]
+        public async Task Say(CommandContext ctx, [RemainingText] string msg)
+        {
+            if (ctx.Member.PermissionsIn(ctx.Channel).HasFlag(DSharpPlus.Permissions.ManageMessages))
+            {
+                if (ctx.Guild.CurrentMember.PermissionsIn(ctx.Channel).HasFlag(DSharpPlus.Permissions.ManageMessages))
+                {
+                    await ctx.Message.DeleteAsync();
+                }
+
+                await ctx.RespondAsync(msg);
+            }
+        }
     }
 }
