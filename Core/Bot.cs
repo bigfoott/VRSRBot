@@ -171,7 +171,7 @@ namespace VRSRBot.Core
                     List<DiscordMember> remove = new List<DiscordMember>();
                     foreach (KeyValuePair<DiscordMember, DateTime> reaction in lastReaction)
                     {
-                        if (reaction.Value.Second > 1)
+                        if (reaction.Value.Second > 3)
                             remove.Add(reaction.Key);
                     }
                     foreach (DiscordMember reaction in remove)
@@ -180,7 +180,7 @@ namespace VRSRBot.Core
                 
                 if (lastReaction.ContainsKey(member))
                 {
-                    if (DateTime.Now.Subtract(lastReaction[member]).TotalSeconds < 1)
+                    if (DateTime.Now.Subtract(lastReaction[member]).TotalSeconds < 3)
                         return;
                     lastReaction.Remove(member);
                 }

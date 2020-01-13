@@ -20,6 +20,11 @@ namespace VRSRBot.CNext
         {
             if (ctx.Member.PermissionsIn(ctx.Channel).HasFlag(DSharpPlus.Permissions.ManageRoles))
             {
+                if (ctx.Guild.CurrentMember.PermissionsIn(ctx.Channel).HasFlag(DSharpPlus.Permissions.ManageMessages))
+                {
+                    await ctx.Message.DeleteAsync();
+                }
+
                 var emoji = DiscordEmoji.FromGuildEmote(ctx.Client, 665860688463396864);
                 var embed = new DiscordEmbedBuilder()
                 {
