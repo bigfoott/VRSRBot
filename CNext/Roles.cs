@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.IO;
 using Newtonsoft.Json;
+using System.Web;
 
 namespace VRSRBot.CNext
 {
@@ -42,6 +43,48 @@ namespace VRSRBot.CNext
 
                 await msg.CreateReactionAsync(emoji);
             }
+        }
+
+        [Command("rolestats")]
+        public async Task RoleStats(CommandContext ctx)
+        {
+            string chartUrl = "bkg=white&c={type:'bar',data:{labels:[_LABELS_]," +
+                              "datasets:[{label:'Roles',data:[_DATA_]}]}," +
+                              "options:{title:{display:false},legend:{display:false},scales:{xAxes:[{gridLines:{display:false}}],yAxes:[{ticks:{precision:0}}]}}}";
+
+            string labels = "";
+            string data = "";
+            string desc = "";
+
+            foreach (RoleMessage rm in Prog.RoleMessages)
+            {
+                DiscordRole role = ctx.Guild.GetRole(rm.RoleId);
+                string roleName = role.Name;
+                if (roleName.EndsWith(" User"))
+                    roleName = roleName.Remove(roleName.LastIndexOf(" User"));
+                labels += $"\"{roleName}\",";
+
+                int userCount = ctx.Guild.Members.Where(m => m.Value.Roles.Contains(role)).Count();
+                data += userCount + ",";
+
+                string _s = "s";
+                if (userCount == 1) _s = "";
+                desc += $"{role.Mention}: {userCount} user{_s}.\n";
+            }
+
+            chartUrl = chartUrl.Replace("_LABELS_", labels).Replace("_DATA_", data);
+            chartUrl = chartUrl.Replace(" ", "%20");
+
+            //await ctx.RespondAsync(HttpUtility.UrlEncode(chartUrl));
+            //return;
+
+            var embed = new DiscordEmbedBuilder()
+            {
+                Title = "Role Stats",
+                Description = desc,
+                ImageUrl = "https://quickchart.io/chart?" + chartUrl
+            };
+            await ctx.RespondAsync("", embed: embed);
         }
     }
 }
