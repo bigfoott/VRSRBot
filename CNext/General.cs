@@ -16,7 +16,8 @@ namespace VRSRBot.CNext
         {
             var embed = new DiscordEmbedBuilder()
             {
-                Description = "Bot made by <@101384280122351616>\n\n[View on Github](https://github.com/bigfoott/VRSRBot)"
+                Description = "Bot made by <@101384280122351616>\n\n[View on Github](https://github.com/bigfoott/VRSRBot)",
+                Color = new DiscordColor("#0165fe")
             };
             await ctx.RespondAsync("", embed: embed);
         }
