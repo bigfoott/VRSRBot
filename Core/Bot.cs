@@ -88,6 +88,8 @@ namespace VRSRBot.Core
             // when a guild becomes available, check for any role messages that got deleted while the bot was offline
             Client.GuildAvailable += async e =>
             {
+                if (e.Guild.Id != 405196443519811584) return; //ignore if its not the main vrsr server
+
                 Prog.Log($"Checking for deleted role messages while offline in server '{e.Guild.Name}'...", "&e");
                 
                 List<RoleMessage> tempRoleMessages = Prog.RoleMessages.ToList();
@@ -180,8 +182,9 @@ namespace VRSRBot.Core
                         },
                         Description = "[View the run on Speedrun.com](" + run.Link + ")",
                         ThumbnailUrl = "https://www.speedrun.com/themes/" + run.GameAbbr + "/cover-256.png",
-                        Timestamp = DateTime.Now
-                    };
+                        Timestamp = DateTime.Now,
+                        Color = new DiscordColor("#0165fe")
+                };
 
                     embed.AddField("Category", $"**[{run.GameName}]({run.GameLink})** - **[{run.Category}]({run.CategoryLink})**");
                     embed.AddField("Time", $"**[{time}]({run.Link})**");

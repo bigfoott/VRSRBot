@@ -31,10 +31,11 @@ namespace VRSRBot.CNext
                 var emoji = DiscordEmoji.FromGuildEmote(ctx.Client, 665860688463396864);
                 var embed = new DiscordEmbedBuilder()
                 {
-                    Description = $"**React to this message with {emoji} to toggle the {role.Mention} role.**"
+                    Description = $"**React to this message with {emoji} to toggle the {role.Mention} role.**",
+                    Color = new DiscordColor("#0165fe")
                 };
                 var msg = await ctx.RespondAsync("", embed: embed);
-
+                
                 var list = Prog.RoleMessages.ToList();
                 list.Add(new RoleMessage(msg.Id, role.Id));
                 Prog.RoleMessages = list.ToArray();
@@ -82,7 +83,8 @@ namespace VRSRBot.CNext
             {
                 Title = "Role Stats",
                 Description = desc,
-                ImageUrl = "https://quickchart.io/chart?" + chartUrl
+                ImageUrl = "https://quickchart.io/chart?" + chartUrl,
+                Color = new DiscordColor("#0165fe")
             };
             await ctx.RespondAsync("", embed: embed);
         }
