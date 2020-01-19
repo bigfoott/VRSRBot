@@ -22,6 +22,7 @@ namespace VRSRBot.Util
         public string Comment;
         public string DeviceType;
         public string DeviceValue;
+        public DateTime TimeStamp;
 
         public Run(string result)
         {
@@ -33,6 +34,7 @@ namespace VRSRBot.Util
             Category = json.data.category.data.name;
             CategoryLink = json.data.category.data.weblink;
             Link = json.data.weblink;
+            TimeStamp = DateTime.Parse(json.data.date);
 
             Time = TimeSpan.FromSeconds((double)json.data.times.primary_t);
 

@@ -17,11 +17,11 @@ namespace VRSRBot.CNext
     class Roles : BaseCommandModule
     {
         [Command("createrolemsg")]
-        public async Task Help(CommandContext ctx, DiscordRole role)
+        public async Task CreateRoleMsg(CommandContext ctx, DiscordRole role)
         {
             if (ctx.Channel.Id != Prog.Config.RoleChannel) return;
 
-            if (ctx.Member.PermissionsIn(ctx.Channel).HasFlag(DSharpPlus.Permissions.ManageRoles))
+            if (ctx.Member.Roles.Any(r => r.Id == 405196930269052938 || r.Id == 667232505631604760)) // only people with admin/bot creator role
             {
                 if (ctx.Guild.CurrentMember.PermissionsIn(ctx.Channel).HasFlag(DSharpPlus.Permissions.ManageMessages))
                 {

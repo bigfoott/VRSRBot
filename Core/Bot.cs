@@ -143,9 +143,15 @@ namespace VRSRBot.Core
             Twitter = new TwitterListener(Config.TwitterCfg.ConsumerKey, Config.TwitterCfg.ConsumerSecret, Config.TwitterCfg.AccessToken, Config.TwitterCfg.AccessTokenSecret);
             Twitter.TwitterStream.MatchingTweetReceived += async (sender, args) =>
             {
-                DiscordChannel channel = await Client.GetChannelAsync(Config.WRChannel);
-                string[] url = args.Tweet.Urls[0].ExpandedURL.Split('/');
-                await HandleNewWR(url[url.Length - 1], channel);
+                if (args.Tweet.Text.Contains("[__TEST__]")) return; // if testing tweets, dont post them on the public bot
+                
+                try
+                {
+                    DiscordChannel channel = await Client.GetChannelAsync(Config.WRChannel);
+                    string[] url = args.Tweet.Urls[0].ExpandedURL.Split('/');
+                    await HandleNewWR(url[url.Length - 1], channel);
+                }
+                catch { }
             };
             Twitter.Init();
         }
@@ -182,7 +188,7 @@ namespace VRSRBot.Core
                         },
                         Description = "[View the run on Speedrun.com](" + run.Link + ")",
                         ThumbnailUrl = "https://www.speedrun.com/themes/" + run.GameAbbr + "/cover-256.png",
-                        Timestamp = DateTime.Now,
+                        Timestamp = run.TimeStamp,
                         Color = new DiscordColor("#0165fe")
                 };
 
