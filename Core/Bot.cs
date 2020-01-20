@@ -68,10 +68,7 @@ namespace VRSRBot.Core
             Client.MessageReactionAdded += async e =>
             {
                 await ToggleRole((DiscordMember)e.User, e.Guild.GetRole(Prog.RoleMessages.FirstOrDefault(r => r.MessageId == e.Message.Id).RoleId));
-            };
-            Client.MessageReactionRemoved += async e =>
-            {
-                await ToggleRole((DiscordMember)e.User, e.Guild.GetRole(Prog.RoleMessages.FirstOrDefault(r => r.MessageId == e.Message.Id).RoleId));
+                await e.Message.DeleteReactionAsync(e.Emoji, e.User);
             };
             Client.MessageDeleted += async e =>
             {
@@ -214,23 +211,24 @@ namespace VRSRBot.Core
         {
             if (member.Id != BotId)
             {
-                // Clear out the lastReaction variable if it starts to get too full
-                if (lastReaction.Count > 0)
+                // Clear out the lastReaction list if it starts to get too full
+                if (lastReaction.Count > 10)
                 {
                     List<DiscordMember> remove = new List<DiscordMember>();
                     foreach (KeyValuePair<DiscordMember, DateTime> reaction in lastReaction)
                     {
-                        if (reaction.Value.Second > 3)
+                        if (DateTime.Now.Subtract(reaction.Value).TotalSeconds > 3)
                             remove.Add(reaction.Key);
                     }
                     foreach (DiscordMember reaction in remove)
                         lastReaction.Remove(reaction);
                 }
-                
+
                 if (lastReaction.ContainsKey(member))
                 {
                     if (DateTime.Now.Subtract(lastReaction[member]).TotalSeconds < 3)
                         return;
+                    
                     lastReaction.Remove(member);
                 }
                 lastReaction.Add(member, DateTime.Now);
