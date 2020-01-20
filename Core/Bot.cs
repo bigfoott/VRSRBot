@@ -28,7 +28,7 @@ namespace VRSRBot.Core
         public TwitterListener Twitter;
 
         private static ulong BotId;
-        private static Dictionary<DiscordMember, DateTime> lastReaction;
+        private static Dictionary<DiscordMember, KeyValuePair<ulong, DateTime>> lastReaction;
 
         public Bot(Config cfg)
         {
@@ -127,7 +127,7 @@ namespace VRSRBot.Core
                 await Client.UpdateStatusAsync(new DiscordActivity("speedrun.com", ActivityType.Watching), UserStatus.Online);
                 
                 BotId = Client.CurrentUser.Id;
-                lastReaction = new Dictionary<DiscordMember, DateTime>();
+                lastReaction = new Dictionary<DiscordMember, KeyValuePair<ulong, DateTime>>();
                 
             };
 
@@ -215,9 +215,9 @@ namespace VRSRBot.Core
                 if (lastReaction.Count > 10)
                 {
                     List<DiscordMember> remove = new List<DiscordMember>();
-                    foreach (KeyValuePair<DiscordMember, DateTime> reaction in lastReaction)
+                    foreach (KeyValuePair<DiscordMember, KeyValuePair<ulong, DateTime>> reaction in lastReaction)
                     {
-                        if (DateTime.Now.Subtract(reaction.Value).TotalSeconds > 2)
+                        if (DateTime.Now.Subtract(reaction.Value.Value).TotalSeconds > 1)
                             remove.Add(reaction.Key);
                     }
                     foreach (DiscordMember reaction in remove)
@@ -226,12 +226,14 @@ namespace VRSRBot.Core
 
                 if (lastReaction.ContainsKey(member))
                 {
-                    if (DateTime.Now.Subtract(lastReaction[member]).TotalSeconds < 2)
+                    if (DateTime.Now.Subtract(lastReaction[member].Value).TotalSeconds < 1 && lastReaction[member].Key == role.Id)
                         return;
                     
                     lastReaction.Remove(member);
                 }
-                lastReaction.Add(member, DateTime.Now);
+                var kvp = new KeyValuePair<ulong, DateTime>(role.Id, DateTime.Now);
+                
+                lastReaction.Add(member, kvp);
                 
                 if (member.Roles.Contains(role))
                     await member.RevokeRoleAsync(role);
