@@ -25,7 +25,7 @@ namespace VRSRBot.Util
         public DateTime TimeStamp;
 
         public Run(string result)
-        {
+        {            
             dynamic json = JsonConvert.DeserializeObject(result);
 
             GameName = json.data.game.data.names.international;
@@ -34,7 +34,7 @@ namespace VRSRBot.Util
             Category = json.data.category.data.name;
             CategoryLink = json.data.category.data.weblink;
             Link = json.data.weblink;
-            TimeStamp = DateTime.Parse(json.data.date);
+            TimeStamp = DateTime.Parse((string)json.data.date);
 
             Time = TimeSpan.FromSeconds((double)json.data.times.primary_t);
 
