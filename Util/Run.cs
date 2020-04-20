@@ -1,4 +1,5 @@
 ﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -52,7 +53,7 @@ namespace VRSRBot.Util
             Comment = json.data.comment;
 
             Game gameObj = Prog.Games.FirstOrDefault(g => g.Name == GameAbbr);
-            if (gameObj.HardwareVariable != "")
+            if (gameObj != null && gameObj.HardwareVariable != "")
             {
                 string hardwarevar = json.data.values[gameObj.HardwareVariable];
                 string hardwareval = "";
@@ -70,8 +71,19 @@ namespace VRSRBot.Util
             }
             else
             {
-                DeviceType = "Platform";
-                DeviceValue = json.data.platform.data.name;
+                bool hasPlatform = true;
+                try { var temp = ((JObject)json.data.platform.data); }
+                catch { hasPlatform = false; }
+
+                if (hasPlatform)
+                {
+                    DeviceType = "Platform";
+                    DeviceValue = json.data.platform.data.name;
+                }
+                else
+                {
+                    DeviceType = "null";
+                }
             }
         }
     }

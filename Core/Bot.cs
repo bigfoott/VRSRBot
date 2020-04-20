@@ -140,7 +140,7 @@ namespace VRSRBot.Core
             Twitter = new TwitterListener(Config.TwitterCfg.ConsumerKey, Config.TwitterCfg.ConsumerSecret, Config.TwitterCfg.AccessToken, Config.TwitterCfg.AccessTokenSecret);
             Twitter.TwitterStream.MatchingTweetReceived += async (sender, args) =>
             {
-                if (args.Tweet.Text.Contains("[__TEST__]")) return; // if testing tweets, dont post them on the public bot
+                //if (args.Tweet.Text.Contains("[__TEST__]")) return; // if testing tweets, dont post them on the public bot
                 
                 try
                 {
@@ -191,15 +191,17 @@ namespace VRSRBot.Core
 
                     embed.AddField("Category", $"**[{run.GameName}]({run.GameLink})** - **[{run.Category}]({run.CategoryLink})**");
                     embed.AddField("Time", $"**[{time}]({run.Link})**");
-
-
+                    
                     if (run.RunnerLink != "")
                         embed.AddField("Runner", $"**[{run.Runner}]({run.RunnerLink})**");
                     else
                         embed.AddField("Runner", $"**{run.Runner}**");
 
-                    embed.AddField(run.DeviceType, $"**{run.DeviceValue}**");
-                    embed.AddField("Runner Comment", $"\"{run.Comment}\"");
+                    if (run.DeviceType != "null")
+                        embed.AddField(run.DeviceType, $"**{run.DeviceValue}**");
+                    
+                    if (run.Comment != null)
+                        embed.AddField("Runner Comment", $"\"{run.Comment}\"");
 
                     await channel.SendMessageAsync("", embed: embed);
                 };
